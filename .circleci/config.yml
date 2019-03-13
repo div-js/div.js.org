@@ -1,0 +1,28 @@
+aliases:
+  - &filter-only-master
+    branches:
+      only:
+        - master
+
+version: 2.1
+jobs:
+  deploy-website:
+    docker:
+      - image: circleci/node:8.11.1
+
+    steps:
+      - checkout
+      - run:
+          name: Deploying to GitHub Pages
+          command: |
+            git config --global user.email "smrsan76@users.noreply.github.com"
+            git config --global user.name "smrsan76"
+            echo "machine github.com login smrsan76 password $GITHUB_TOKEN" > ~/.netrc
+            cd website && npm i && GIT_USER=smrsan76 npm run publish-gh-pages
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - deploy-website:
+        filters: *filter-only-master
